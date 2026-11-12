@@ -1,0 +1,29 @@
+:root {
+  --bg: #f7f7f7; --fg: #222; --muted: #666; --card: #fff; --accent: #ff385c; --border: #e3e3e3;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--fg); background: var(--bg);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #161616; --fg: #eee; --muted: #aaa; --card: #222; --border: #333; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: inherit; }
+.navbar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; padding: 0.75rem 1.25rem;
+  background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+.navbar .brand { font-weight: 700; color: var(--accent); text-decoration: none; }
+.navbar nav { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.navbar nav a { text-decoration: none; padding: 0.35rem 0.6rem; border-radius: 6px; color: var(--muted); font-size: 0.92rem; }
+.navbar nav a.active, .navbar nav a:hover { background: var(--accent); color: #fff; }
+.container { max-width: 1040px; margin: 0 auto; padding: 1.5rem 1rem; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.tile { text-decoration: none; transition: border-color 0.15s; }
+.tile:hover { border-color: var(--accent); }
+.tile h2 { font-size: 1.05rem; margin: 0 0 0.4rem; }
+.tile p, .owner { color: var(--muted); margin: 0; }
+.placeholder { margin-top: 1rem; padding: 1rem; border: 2px dashed var(--border); border-radius: 8px; }
+.status { font-size: 0.9rem; }
+.status-up { color: #1a7f37; }
+.status-down { color: #c62828; }
+code { font-size: 0.85em; }

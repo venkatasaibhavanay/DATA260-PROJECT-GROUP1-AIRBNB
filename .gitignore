@@ -1,0 +1,43 @@
+# --- Secrets / local config ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials*.json
+secrets/
+
+# --- Python ---
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# --- Node / frontend ---
+node_modules/
+frontend/dist/
+*.log
+npm-debug.log*
+
+# --- Local runtime files from scripts ---
+.run/
+tmp/
+*.tmp
+
+# --- OS / IDE ---
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# --- Local Claude Code settings ---
+.claude/

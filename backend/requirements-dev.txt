@@ -1,0 +1,10 @@
+# Shared local development environment (one .venv at the repo root).
+# Each service also has its own requirements.txt used by its Dockerfile.
+-r user-service/requirements.txt
+-r property-service/requirements.txt
+-r booking-service/requirements.txt
+-r messaging-review-service/requirements.txt
+-r ai-service/requirements.txt
+-r analytics-service/requirements.txt
+pytest>=8.0
+httpx>=0.27

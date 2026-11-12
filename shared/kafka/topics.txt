@@ -1,0 +1,15 @@
+# Group 1 Kafka domain topics — single source of truth.
+# Read by shared/kafka/topics.py and infrastructure/kafka/create-topics.sh.
+# A dead-letter topic "<topic>.dlq" is created automatically for each entry.
+property.viewed
+property.saved
+booking.requested
+booking.approved
+booking.cancelled
+message.sent
+review.created
+ai.requests
+debate.round.0
+debate.round.1
+debate.round.2
+ai.results
