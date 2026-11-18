@@ -14,7 +14,7 @@ React frontend · six FastAPI microservices · MySQL · MongoDB · Redis · Apac
 | Sanjana Reddy Katham | Property & Search | `property-service` | 8111 |
 | Venkata Sai Bhavana Yarrapragada | Booking & Reservations | `booking-service` | 8121 |
 | Srija Taduri | Messaging & Reviews | `messaging-review-service` | 8131 |
-| Angela Wai | Agentic AI & Recommendations | `ai-service` | 8141 |
+| Angela Wei | Agentic AI & Recommendations | `ai-service` | 8141 |
 | Eric Zhao | Analytics & Observability | `analytics-service` | 8151 |
 
 Details: [docs/TEAM_RESPONSIBILITIES.md](docs/TEAM_RESPONSIBILITIES.md)
@@ -39,7 +39,7 @@ Full explanation: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 ## Repository structure
 
 ```
-DATA260_Group1_Airbnb/
+DATA260-PROJECT-GROUP1-AIRBNB/
 ├── frontend/                 React + Vite + React Router + Axios (one shared app)
 │   └── src/{components,pages/<module>,services}/
 ├── backend/<service>/        six independent FastAPI services
@@ -72,8 +72,8 @@ Check what you have: `./scripts/check-prereqs.sh`
 ## Quick start (any laptop)
 
 ```bash
-git clone https://github.com/venkatasaibhavanay/data260-group1-airbnb.git
-cd data260-group1-airbnb
+git clone https://github.com/venkatasaibhavanay/DATA260-PROJECT-GROUP1-AIRBNB.git
+cd DATA260-PROJECT-GROUP1-AIRBNB
 
 ./scripts/setup-env.sh        # creates .env with random local passwords (git-ignored)
 ./scripts/setup-python.sh     # creates .venv and installs backend dependencies

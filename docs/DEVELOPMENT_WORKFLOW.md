@@ -24,8 +24,8 @@ never commit `.env` or credentials.
 2. Clone and set up:
 
    ```bash
-   git clone https://github.com/venkatasaibhavanay/data260-group1-airbnb.git
-   cd data260-group1-airbnb
+   git clone https://github.com/venkatasaibhavanay/DATA260-PROJECT-GROUP1-AIRBNB.git
+   cd DATA260-PROJECT-GROUP1-AIRBNB
    git config user.name "Your Name"            # repo-local identity
    git config user.email "you@example.com"     # use the email on your GitHub account
    ./scripts/check-prereqs.sh
