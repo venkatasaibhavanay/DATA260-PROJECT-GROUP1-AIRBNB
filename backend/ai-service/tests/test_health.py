@@ -10,7 +10,7 @@ def test_root_returns_service_metadata():
     assert r.status_code == 200
     body = r.json()
     assert body["service"] == "ai-service"
-    assert body["owner"] == "Angela Wai"
+    assert body["owner"] == "Angela Wei"
 
 
 def test_health_reports_application_only():

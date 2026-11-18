@@ -12,7 +12,7 @@ class Settings(InfraSettings):
     service_name: str = "ai-service"
     service_title: str = "Agentic AI & Recommendations Service"
     service_description: str = "Agentic AI workflows and recommendations coordinated through Kafka."
-    service_owner: str = "Angela Wai"
+    service_owner: str = "Angela Wei"
     port: int = Field(default=8141, validation_alias="AI_SERVICE_PORT")
 
     # External systems this service is expected to use. Only probed by
