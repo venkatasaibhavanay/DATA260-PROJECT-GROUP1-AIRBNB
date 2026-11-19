@@ -15,17 +15,18 @@ other through **REST** (synchronous queries) or **Kafka** (asynchronous events).
 ## Frontend → backend
 
 - One Axios client per service, created in `frontend/src/services/api.js` from `VITE_*_API_URL`.
-- Each request carries an `X-Trace-Id` header. Services echo it on errors and copy it into Kafka events.
+- Each request carries `X-Trace-ID` and `X-Request-ID` headers (plus `Authorization` and, where required,
+  `Idempotency-Key`). Services echo both IDs on every response and copy the trace ID into Kafka events.
 - CORS on every service allows the origins in `CORS_ORIGINS` (default `http://localhost:5101`).
-- Versioned feature routes: `/api/v1/<resource>` (see API_CONVENTIONS.md).
+- Versioned action-style routes: `POST /api/v1/<resource>/<action>` (see API_CONVENTIONS.md).
 
 ## Database responsibilities
 
 | Store | Used for | Why |
 |---|---|---|
-| **MySQL** (`airbnb_group1`) | users, hosts, property core records, **bookings**, aggregates | ACID transactions, constraints (e.g. no double-booking), relational joins |
-| **MongoDB** (`airbnb_group1`) | rich listing documents, messages, reviews, AI agent state, raw analytics events | flexible schema, nested documents, high write volume |
-| **Redis** | search result caching, availability locks, sessions, rate limits | in-memory speed, TTLs, atomic operations |
+| **MySQL** (`airbnb_group1`) | guests, hosts, properties, availability, **reservations** and `reservation_nights` | ACID transactions and constraints. Double booking is prevented with a MySQL row lock on the property plus `UNIQUE(property_id, night_date)`, not Redis locks |
+| **MongoDB** (`airbnb_group1`) | message threads, messages, reviews, AI agent state, **analytics events and rollups** | flexible schema, nested documents, high write volume. Analytics stores events and rollups in MongoDB, not MySQL aggregates |
+| **Redis** | property search/detail/availability cache, JWT denylist | in-memory speed, TTLs |
 
 Rule: **each table/collection has exactly one owning service.** Other services read through
 that service's API or react to its events. They never write to its tables.
@@ -35,21 +36,32 @@ that service's API or react to its events. They never write to its tables.
 - Single-node KRaft broker (no ZooKeeper). Host clients: `localhost:9091`. Containers: `kafka:29092`.
 - Topics are listed in `shared/kafka/topics.txt` and created by the `kafka-init` container.
   Each topic `X` has a dead-letter topic `X.dlq`.
-- Every message is a JSON **event envelope** (`shared/kafka/envelope.py`):
-  `event_type, trace_id, timestamp, actor_id, entity{entity_type, entity_id}, payload, idempotency_key`.
-- Message key = `entity_id`, so events for one booking/property stay in order within a partition.
-- Consumers must be **idempotent**: store processed `idempotency_key`s and skip duplicates.
+- Every message is a JSON **event envelope** (`shared/kafka/envelope.py`) with 10 fields:
+  `event_id, event_type, schema_version, trace_id, timestamp, source_service, actor_id,
+  entity{entity_type, entity_id}, idempotency_key, payload`. `event_type` must equal the topic.
+- Partition key: `property_id` for property, availability, booking and review topics; `thread_id`
+  for message topics; `trace_id` for AI topics. This keeps each entity's events in order.
+- Consumers must be **idempotent**: record `(consumer_group, idempotency_key)` in
+  `<prefix>_processed_events` in the same transaction and skip duplicates.
 
 Example flow, a booking:
 
 ```
-guest ─POST /api/v1/bookings─► booking-service ──(MySQL txn)──► bookings table
-                                     │
-                                     └─publish booking.requested─► Kafka
-                                                                     ├─► analytics-service (metrics)
-host ─POST /bookings/{id}/approve─► booking-service ─publish booking.approved─►
-                                                                     ├─► messaging-review-service (open thread)
-                                                                     └─► analytics-service
+guest ─POST /api/v1/bookings/request─► booking-service API
+          stores the idempotency record, publishes booking.requested (key property_id), returns 202
+                                                     │
+                                                     ▼
+          booking worker process (consumer group booking-worker)
+          locks the property row, inserts the reservation and one reservation_nights row per night
+          (UNIQUE(property_id, night_date)), publishes booking.pending or booking.rejected
+                                                     │
+                                                     ▼
+          guest is notified over WS /ws/bookings
+
+host ─POST /api/v1/bookings/approve─► booking-service ─publish booking.approved─►
+          ├─► property-service: updates availability and Redis cache
+          ├─► messaging-review-service: records review eligibility
+          └─► analytics-service: records the event
 ```
 
 ## Redis caching
@@ -57,7 +69,7 @@ host ─POST /bookings/{id}/approve─► booking-service ─publish booking.app
 - Cache-aside: read Redis → on miss read DB → write Redis with a TTL.
 - Key naming: `g1:<service>:<entity>:<id>` (e.g. `g1:property:search:<hash>`).
 - Invalidate on writes, or react to Kafka events (e.g. clear availability cache on `booking.approved`).
-- Locks for booking: `SET g1:booking:lock:<property_id>:<date> <booking_id> NX EX 30`.
+- JWT denylist: `g1:auth:denylist:<jti>` with a TTL until the token expires.
 
 ## Agentic AI services
 
@@ -70,8 +82,8 @@ host ─POST /bookings/{id}/approve─► booking-service ─publish booking.app
 
 ## Analytics & observability
 
-- `analytics-service` consumes all domain topics, stores raw events in MongoDB, and maintains
-  aggregates (bookings/day, conversion, popular properties) in MySQL.
+- `analytics-service` consumes all domain topics and all `.dlq` topics, and stores events,
+  service logs, DLQ records and rollups in MongoDB.
 - Observability: every service exposes `/health` (process) and `/health/dependencies` (live probes).
   `trace_id` ties an HTTP request to every event it causes.
 - The analytics frontend page shows metrics and service health.
