@@ -23,7 +23,7 @@ Details: [docs/TEAM_RESPONSIBILITIES.md](docs/TEAM_RESPONSIBILITIES.md)
 
 ```
  React (Vite) :5101
-      │  REST (axios, X-Trace-Id)
+      │  REST (axios, JWT, X-Trace-ID)
       ▼
  ┌────────────┬──────────────┬──────────────┬───────────────┬────────────┬──────────────┐
  │ user :8101 │ property     │ booking      │ messaging &   │ ai :8141   │ analytics    │
@@ -46,8 +46,9 @@ DATA260_Group1_Airbnb/
 │   ├── app/{main.py,config.py,routes,models,schemas,services,database,kafka}/
 │   ├── tests/  requirements.txt  Dockerfile  README.md
 ├── shared/                   code shared by all services
-│   ├── kafka/                event envelope, topics.txt, producer/consumer helpers
-│   ├── schemas/  errors/     common response shapes, standard error format
+│   ├── kafka/                event envelope, topics.txt, producer/consumer, DLQ, idempotency
+│   ├── schemas/  errors/     pagination, money, StrictModel; standard error format + trace IDs
+│   ├── auth/  responses.py   JWT auth and roles; {data, meta} success envelope
 │   └── config.py             infrastructure settings (reads root .env)
 ├── database/{mysql,mongodb,seed}/   init scripts (run on first container start)
 ├── infrastructure/docker-compose.yml
