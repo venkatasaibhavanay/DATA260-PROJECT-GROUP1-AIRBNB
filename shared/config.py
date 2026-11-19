@@ -43,6 +43,11 @@ class InfraSettings(BaseSettings):
 
     kafka_bootstrap_servers: str = "localhost:9091"
 
+    # Auth (shared.auth). JWT_SECRET must be identical for every service.
+    jwt_secret: str = ""
+    jwt_algorithm: str = "HS256"
+    jwt_expiry_minutes: int = 30
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]

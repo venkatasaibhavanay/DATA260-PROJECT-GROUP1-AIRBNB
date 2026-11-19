@@ -3,5 +3,8 @@
 Topic names are defined centrally in shared/kafka/topics.py.
 Every message must be a validated shared.kafka.EventEnvelope.
 """
+from shared.kafka.topics import ALL_TOPICS
+
 PRODUCES: list[str] = []
-CONSUMES: list[str] = ['property.viewed', 'property.saved', 'booking.requested', 'booking.approved', 'booking.cancelled', 'message.sent', 'review.created', 'ai.results']
+# Every domain topic plus every .dlq topic.
+CONSUMES: list[str] = list(ALL_TOPICS)

@@ -3,18 +3,32 @@ from pathlib import Path
 
 DLQ_SUFFIX = ".dlq"
 
+USER_REGISTERED = "user.registered"
+GUEST_DELETED = "guest.deleted"
+PROPERTY_CREATED = "property.created"
+PROPERTY_UPDATED = "property.updated"
+PROPERTY_DELETED = "property.deleted"
 PROPERTY_VIEWED = "property.viewed"
 PROPERTY_SAVED = "property.saved"
+PROPERTY_UNSAVED = "property.unsaved"
+AVAILABILITY_UPDATED = "availability.updated"
 BOOKING_REQUESTED = "booking.requested"
+BOOKING_PENDING = "booking.pending"
+BOOKING_REJECTED = "booking.rejected"
 BOOKING_APPROVED = "booking.approved"
+BOOKING_DECLINED = "booking.declined"
 BOOKING_CANCELLED = "booking.cancelled"
 MESSAGE_SENT = "message.sent"
+MESSAGE_READ = "message.read"
 REVIEW_CREATED = "review.created"
+REVIEW_RESPONDED = "review.responded"
 AI_REQUESTS = "ai.requests"
+AI_PARSED = "ai.parsed"
 DEBATE_ROUND_0 = "debate.round.0"
 DEBATE_ROUND_1 = "debate.round.1"
 DEBATE_ROUND_2 = "debate.round.2"
 AI_RESULTS = "ai.results"
+AI_DECISIONS = "ai.decisions"
 
 
 def _load() -> list[str]:
