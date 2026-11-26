@@ -1,6 +1,6 @@
 # Agentic AI & Recommendations Service
 
-**Owner:** Angela Wai
+**Owner:** Angela Wei
 **Port:** 8141 (env `AI_SERVICE_PORT`)
 **Swagger:** http://localhost:8141/docs
 **Dependencies:** mongodb, redis, kafka
