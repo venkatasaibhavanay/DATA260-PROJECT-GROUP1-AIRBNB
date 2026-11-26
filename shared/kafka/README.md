@@ -1,43 +1,38 @@
 # Shared Kafka contracts
 
-## Event envelope
+Full rules: API design document section 3 and [`docs/API_CONVENTIONS.md`](../../docs/API_CONVENTIONS.md#kafka).
 
-Every message on every topic is a JSON `EventEnvelope`:
+## Event envelope (10 fields)
 
 ```json
 {
+  "event_id": "c1d2e3f4-5a6b-4c7d-8e9f-0a1b2c3d4e5f",
   "event_type": "booking.requested",
-  "trace_id": "5f0c9a3e-...",
-  "timestamp": "2026-11-11T21:05:00Z",
-  "actor_id": "user_42",
-  "entity": { "entity_type": "booking", "entity_id": "bk_1001" },
-  "payload": { "property_id": "prop_7", "check_in": "2026-12-01", "check_out": "2026-12-05" },
-  "idempotency_key": "booking.requested:bk_1001"
+  "schema_version": 1,
+  "trace_id": "7f3c9a2e-1b4d-4e8a-9c6f-2d5b8e1a0c47",
+  "timestamp": "2026-11-02T18:30:00Z",
+  "source_service": "booking-service",
+  "actor_id": "guest:1001",
+  "entity": { "entity_type": "reservation", "entity_id": "9b2f6c1e-3d4a-4f5b-8c7d-1e2f3a4b5c6d" },
+  "idempotency_key": "booking.requested:9b2f6c1e-3d4a-4f5b-8c7d-1e2f3a4b5c6d",
+  "payload": { "property_id": 2001, "check_in": "2026-12-18", "check_out": "2026-12-20" }
 }
 ```
 
-- Validate **before publishing** (`new_event`, `encode_event`, `EnvelopeProducer.publish`)
-  and **after consuming** (`decode_event`, `handle_message`).
-- Unknown top-level fields are rejected. Put domain data in `payload`.
-- `timestamp` must include a timezone. It's normalised to UTC.
-- Message key = `entity.entity_id`, so one entity's events stay in order.
+- Build with `new_event(event_type, source_service=..., actor_id=..., entity_type=..., entity_id=...)`.
+- Publish with `EnvelopeProducer.publish(topic, env, key=...)`. `event_type` must equal the topic.
+  Partition key: `property_id` for property/availability/booking/review topics, `thread_id` for
+  message topics, `trace_id` for AI topics.
+- Consume with `run_consumer(...)`; raise `TransientError` to retry (1 s, 2 s, 4 s) or
+  `PermanentError` to dead-letter. Skip duplicates with `shared.kafka.idempotency`.
 
 ## Topics
 
-Defined in [`topics.txt`](topics.txt) (single source of truth) and created by the
+Defined in [`topics.txt`](topics.txt) (single source of truth, 26 topics) and created by the
 `kafka-init` container. Each topic `X` has a dead-letter topic `X.dlq`.
 
-| Topic | Producer | Typical consumers |
-|---|---|---|
-| property.viewed / property.saved | property-service | ai-service, analytics-service |
-| booking.requested / approved / cancelled | booking-service | messaging-review-service, analytics-service |
-| message.sent / review.created | messaging-review-service | analytics-service |
-| ai.requests | any service / frontend via API | ai-service |
-| debate.round.0 / 1 / 2 | ai-service agents | ai-service agents |
-| ai.results | ai-service | requesting service, analytics-service |
+## Dead-letter record
 
-## Dead-letter convention
-
-A message that fails envelope validation, or fails processing after retries, is
-published unchanged to `<topic>.dlq` with headers `error` and `source_topic`.
-Never drop invalid messages silently.
+`build_dlq_record(...)` produces JSON with exactly: `original_topic, partition, offset, trace_id,
+error_code, failure_reason, attempts, failed_at, consumer_group, raw_message`.
+Error codes: `ENVELOPE_INVALID`, `ENVELOPE_TOPIC_MISMATCH`, `RETRIES_EXHAUSTED`, `HANDLER_FAILED`.

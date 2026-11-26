@@ -14,7 +14,7 @@ React frontend · six FastAPI microservices · MySQL · MongoDB · Redis · Apac
 | Sanjana Reddy Katham | Property & Search | `property-service` | 8111 |
 | Venkata Sai Bhavana Yarrapragada | Booking & Reservations | `booking-service` | 8121 |
 | Srija Taduri | Messaging & Reviews | `messaging-review-service` | 8131 |
-| Angela Wai | Agentic AI & Recommendations | `ai-service` | 8141 |
+| Angela Wei | Agentic AI & Recommendations | `ai-service` | 8141 |
 | Eric Zhao | Analytics & Observability | `analytics-service` | 8151 |
 
 Details: [docs/TEAM_RESPONSIBILITIES.md](docs/TEAM_RESPONSIBILITIES.md)
@@ -23,7 +23,7 @@ Details: [docs/TEAM_RESPONSIBILITIES.md](docs/TEAM_RESPONSIBILITIES.md)
 
 ```
  React (Vite) :5101
-      │  REST (axios, X-Trace-Id)
+      │  REST (axios, JWT, X-Trace-ID)
       ▼
  ┌────────────┬──────────────┬──────────────┬───────────────┬────────────┬──────────────┐
  │ user :8101 │ property     │ booking      │ messaging &   │ ai :8141   │ analytics    │
@@ -39,15 +39,16 @@ Full explanation: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 ## Repository structure
 
 ```
-DATA260_Group1_Airbnb/
+DATA260-PROJECT-GROUP1-AIRBNB/
 ├── frontend/                 React + Vite + React Router + Axios (one shared app)
 │   └── src/{components,pages/<module>,services}/
 ├── backend/<service>/        six independent FastAPI services
 │   ├── app/{main.py,config.py,routes,models,schemas,services,database,kafka}/
 │   ├── tests/  requirements.txt  Dockerfile  README.md
 ├── shared/                   code shared by all services
-│   ├── kafka/                event envelope, topics.txt, producer/consumer helpers
-│   ├── schemas/  errors/     common response shapes, standard error format
+│   ├── kafka/                event envelope, topics.txt, producer/consumer, DLQ, idempotency
+│   ├── schemas/  errors/     pagination, money, StrictModel; standard error format + trace IDs
+│   ├── auth/  responses.py   JWT auth and roles; {data, meta} success envelope
 │   └── config.py             infrastructure settings (reads root .env)
 ├── database/{mysql,mongodb,seed}/   init scripts (run on first container start)
 ├── infrastructure/docker-compose.yml
@@ -72,8 +73,8 @@ Check what you have: `./scripts/check-prereqs.sh`
 ## Quick start (any laptop)
 
 ```bash
-git clone https://github.com/venkatasaibhavanay/data260-group1-airbnb.git
-cd data260-group1-airbnb
+git clone https://github.com/venkatasaibhavanay/DATA260-PROJECT-GROUP1-AIRBNB.git
+cd DATA260-PROJECT-GROUP1-AIRBNB
 
 ./scripts/setup-env.sh        # creates .env with random local passwords (git-ignored)
 ./scripts/setup-python.sh     # creates .venv and installs backend dependencies

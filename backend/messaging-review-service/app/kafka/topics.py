@@ -3,5 +3,5 @@
 Topic names are defined centrally in shared/kafka/topics.py.
 Every message must be a validated shared.kafka.EventEnvelope.
 """
-PRODUCES: list[str] = ['message.sent', 'review.created']
-CONSUMES: list[str] = ['booking.approved']
+PRODUCES: list[str] = ['message.sent', 'message.read', 'review.created', 'review.responded']
+CONSUMES: list[str] = ['message.sent', 'booking.approved', 'booking.cancelled']

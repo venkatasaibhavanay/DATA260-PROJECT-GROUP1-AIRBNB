@@ -5,12 +5,12 @@ its Kafka events, validation and error handling, tests, and API docs.
 
 | Member | Module | Frontend folder | Service (port) | Data | Kafka (produces → consumes) | Branch |
 |---|---|---|---|---|---|---|
-| Nathan Pak | User & Host Profiles + shared setup | `pages/users` | `user-service` (8101) | MySQL users/hosts, Redis sessions | — | `feature/users-nathan` |
-| Sanjana Reddy Katham | Property & Search | `pages/properties` | `property-service` (8111) | MySQL listings, MongoDB rich listing docs, Redis search cache | `property.viewed`, `property.saved` | `feature/properties-sanjana` |
-| Venkata Sai Bhavana Yarrapragada | Booking & Reservations | `pages/bookings` | `booking-service` (8121) | MySQL bookings (transactional), Redis availability locks | `booking.requested`, `booking.approved`, `booking.cancelled` | `feature/bookings-bhavana` |
-| Srija Taduri | Messaging & Reviews | `pages/messaging-reviews` | `messaging-review-service` (8131) | MongoDB messages & reviews | `message.sent`, `review.created` ← `booking.approved` | `feature/messaging-srija` |
-| Angela Wai | Agentic AI & Recommendations | `pages/ai` | `ai-service` (8141) | MongoDB agent state, Redis cache | `debate.round.*`, `ai.results` ← `ai.requests`, `property.*` | `feature/ai-angela` |
-| Eric Zhao | Analytics & Observability | `pages/analytics` | `analytics-service` (8151) | MongoDB event store, MySQL aggregates | ← all domain topics | `feature/analytics-eric` |
+| Nathan Pak | User & Host Profiles + shared setup | pages/users | user-service (8101) | MySQL guests, hosts; Redis JWT denylist | user.registered, guest.deleted ← property.saved, property.unsaved, booking.approved, message.sent | feature/users-nathan |
+| Sanjana Reddy Katham | Property & Search | pages/properties | property-service (8111) | MySQL properties, property_amenities, property_photos, availability_blocks, saved_properties; Redis search/detail/availability cache | property.created, property.updated, property.deleted, property.viewed, property.saved, property.unsaved, availability.updated ← booking.pending, booking.approved, booking.declined, booking.cancelled, review.created | feature/properties-sanjana |
+| Venkata Sai Bhavana Yarrapragada | Booking & Reservations | pages/bookings | booking-service (8121) + booking worker process | MySQL reservations, reservation_nights, reservation_status_history, property_locks, idempotency_keys | booking.requested, booking.pending, booking.rejected, booking.approved, booking.declined, booking.cancelled ← booking.requested, guest.deleted, property.deleted, ai.results | feature/bookings-bhavana |
+| Srija Taduri | Messaging & Reviews | pages/messaging-reviews | messaging-review-service (8131) | MongoDB threads, messages, idempotency_keys, reviews, review_eligibility | message.sent, message.read, review.created, review.responded ← message.sent, booking.approved, booking.cancelled | feature/messaging-srija |
+| Angela Wei | Agentic AI & Recommendations | pages/ai | ai-service (8141) | MongoDB ai_tasks, plans, debate_messages, votes, feedback, agent_versions, benchmark_runs | ai.requests, ai.parsed, debate.round.0/1/2, ai.results, ai.decisions ← same AI topics | feature/ai-angela |
+| Eric Zhao | Analytics & Observability | pages/analytics | analytics-service (8151) | MongoDB event_log, service_logs, dlq_records, rollups | ← all domain topics and all .dlq topics | feature/analytics-eric |
 
 ## Every slice must include
 
