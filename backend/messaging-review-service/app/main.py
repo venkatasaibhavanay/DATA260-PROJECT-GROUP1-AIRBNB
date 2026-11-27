@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routes import health
+from app.routes import health, messaging
 from shared.errors import register_exception_handlers
 
 app = FastAPI(
@@ -33,3 +33,5 @@ app.include_router(health.router)
 # Add feature routers here, e.g.:
 # from app.routes import messaging
 # app.include_router(messaging.router, prefix="/api/v1/messaging")
+
+app.include_router(messaging.router, prefix="/api/v1")
