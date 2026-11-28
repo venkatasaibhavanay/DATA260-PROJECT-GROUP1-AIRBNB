@@ -2,14 +2,17 @@
 
 Run locally from the repository root:
     ./scripts/start-service.sh ai-service
+
 Swagger UI: http://localhost:8141/docs
 """
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routes import health
+from app.routes import health, recommendations
 from shared.errors import register_exception_handlers
+
 
 app = FastAPI(
     title=settings.service_title,
@@ -30,6 +33,4 @@ app.add_middleware(
 register_exception_handlers(app)
 
 app.include_router(health.router)
-# Add feature routers here, e.g.:
-# from app.routes import ai
-# app.include_router(ai.router, prefix="/api/v1/ai")
+app.include_router(recommendations.router, prefix="/api/v1/ai")
