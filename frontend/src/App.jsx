@@ -3,6 +3,8 @@ import NavBar from './components/NavBar.jsx'
 import HomePage from './pages/HomePage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import UsersPage from './pages/users/UsersPage.jsx'
+import LoginPage from './pages/users/LoginPage.jsx'
+import SignupPage from './pages/users/SignupPage.jsx'
 import PropertiesPage from './pages/properties/PropertiesPage.jsx'
 import BookingsPage from './pages/bookings/BookingsPage.jsx'
 import MessagingReviewsPage from './pages/messaging-reviews/MessagingReviewsPage.jsx'
@@ -17,6 +19,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/users" element={<UsersPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="/properties" element={<PropertiesPage />} />
           <Route path="/bookings" element={<BookingsPage />} />
           <Route path="/messaging-reviews" element={<MessagingReviewsPage />} />

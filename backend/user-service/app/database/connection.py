@@ -28,4 +28,6 @@ def get_redis():
         port=settings.redis_port,
         password=settings.redis_password or None,
         decode_responses=True,
+        socket_timeout=2,
+        socket_connect_timeout=2,
     )
