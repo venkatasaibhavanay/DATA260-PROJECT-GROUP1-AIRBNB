@@ -6,6 +6,8 @@
 
 Accounts, sign-in, guest and host profiles. Contract: API design document section 6.
 
+Schema diagram, indexes and sample rows: [`docs/schema/user-service.md`](../../docs/schema/user-service.md).
+
 ## Endpoints (all under `/api/v1`)
 
 | Route | Auth | Notes |
@@ -43,6 +45,13 @@ Consumers (separate process, consumer groups `user-counters` and `user-host-metr
 
 ```bash
 cd backend/user-service && PYTHONPATH=.:../.. ../../.venv/bin/python -m app.workers
+```
+
+Load sample guests and hosts (safe to re-run; password `SamplePass1`; add `--publish-events` to also send
+`user.registered` to Kafka):
+
+```bash
+cd backend/user-service && PYTHONPATH=.:../.. ../../.venv/bin/python -m app.seed
 ```
 
 Seed the admin account (password is prompted):

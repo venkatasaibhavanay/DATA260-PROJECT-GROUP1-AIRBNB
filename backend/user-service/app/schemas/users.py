@@ -3,7 +3,7 @@ import re
 from datetime import date, datetime
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from shared.schemas import Money, StrictModel
 
@@ -52,6 +52,8 @@ class Preferences(StrictModel):
 # ---------- auth ----------
 
 class LoginRequest(StrictModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{"email": "maya.chen@example.com", "password": "StrongPass1!", "role": "guest"}]})
+
     email: str
     password: str = Field(min_length=1, max_length=128)
     role: LoginRole
@@ -79,6 +81,8 @@ class LoginOut(TokenOut):
 # ---------- guests ----------
 
 class GuestCreate(StrictModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{"first_name": "Maya", "last_name": "Chen", "email": "maya.chen@example.com", "password": "StrongPass1!", "phone": "+14085550101", "location": "San Jose, CA", "preferences": {"preferred_locations": ["San Jose"], "budget_max": "250.00", "amenities": ["parking", "kitchen"], "property_types": ["apartment"], "travel_purpose": "business"}}]})
+
     first_name: str = Field(min_length=1, max_length=60)
     last_name: str = Field(min_length=1, max_length=60)
     email: str
@@ -100,10 +104,14 @@ class GuestCreate(StrictModel):
 
 
 class GuestIdRequest(StrictModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{"guest_id": 1001}]})
+
     guest_id: int = Field(ge=1)
 
 
 class GuestUpdate(StrictModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{"guest_id": 1001, "phone": "+14085550102", "location": "Sunnyvale, CA", "preferences": {"budget_max": "300.00", "amenities": ["parking", "kitchen", "wifi"]}}]})
+
     guest_id: int = Field(ge=1)
     first_name: Optional[str] = Field(default=None, min_length=1, max_length=60)
     last_name: Optional[str] = Field(default=None, min_length=1, max_length=60)
@@ -136,6 +144,8 @@ class GuestSignupOut(TokenOut):
 
 
 class GuestSearch(StrictModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{"q": "chen", "location": "San Jose", "page": 1, "page_size": 20}]})
+
     q: Optional[str] = None
     location: Optional[str] = None
     page: int = 1
@@ -145,6 +155,8 @@ class GuestSearch(StrictModel):
 # ---------- hosts ----------
 
 class HostCreate(StrictModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{"name": "Daniel Ortiz", "email": "daniel.ortiz@example.com", "password": "StrongPass1!", "phone": "+14085550199"}]})
+
     name: str = Field(min_length=1, max_length=120)
     email: str
     password: str = Field(max_length=128)
@@ -155,10 +167,14 @@ class HostCreate(StrictModel):
 
 
 class HostIdRequest(StrictModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{"host_id": 501}]})
+
     host_id: int = Field(ge=1)
 
 
 class HostUpdate(StrictModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{"host_id": 501, "name": "Daniel Ortiz", "phone": "+14085550198"}]})
+
     host_id: int = Field(ge=1)
     name: Optional[str] = Field(default=None, min_length=1, max_length=120)
     email: Optional[str] = None
@@ -194,3 +210,74 @@ class UpdatedOut(BaseModel):
 
 class PhotoOut(BaseModel):
     profile_photo_url: str
+
+
+# ---------- documented response shapes (Swagger) ----------
+
+class GuestProfileOut(BaseModel):
+    """Own profile and admins: every field. Hosts: only guest_id, first_name, last_name initial,
+    location, profile_photo_url and profile_created_datetime (other keys are omitted, not null)."""
+    model_config = ConfigDict(json_schema_extra={"examples": [{
+        "guest_id": 1001, "first_name": "Maya", "last_name": "Chen", "email": "maya.chen@example.com",
+        "phone": "+14085550101", "location": "San Jose, CA", "profile_photo_url": "/media/profiles/guests/1001.jpg",
+        "preferences": {"preferred_locations": ["San Jose"], "budget_max": "250.00", "amenities": ["parking", "kitchen"],
+                        "property_types": ["apartment"], "travel_purpose": "business"},
+        "saved_properties_count": 4, "booking_count": 2, "profile_created_datetime": "2026-11-02T18:30:00Z"}]})
+
+    guest_id: int
+    first_name: str
+    last_name: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    location: str
+    profile_photo_url: Optional[str] = None
+    preferences: Optional[dict] = None
+    saved_properties_count: Optional[int] = None
+    booking_count: Optional[int] = None
+    profile_created_datetime: datetime
+
+
+class GuestSearchItem(BaseModel):
+    guest_id: int
+    first_name: str
+    last_name: str = Field(examples=["C."])
+    location: str
+    profile_photo_url: Optional[str] = None
+    email: Optional[str] = Field(default=None, description="Admins only")
+
+
+class GuestSearchPage(BaseModel):
+    items: list[GuestSearchItem]
+    page: int
+    page_size: int
+    total: int
+    total_pages: int
+
+
+class GuestUpdatedOut(BaseModel):
+    guest_id: int
+    updated_datetime: datetime
+
+
+class HostProfileOut(BaseModel):
+    """email, phone and access_level are returned only to the host themself and to admins."""
+    model_config = ConfigDict(json_schema_extra={"examples": [{
+        "host_id": 501, "name": "Daniel Ortiz", "email": "daniel.ortiz@example.com", "phone": "+14085550199",
+        "profile_photo_url": "/media/profiles/hosts/501.jpg", "verification_status": "verified",
+        "response_rate": "0.96", "response_time_minutes": 42, "host_since": "2026-11-02", "access_level": "standard"}]})
+
+    host_id: int
+    name: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    profile_photo_url: Optional[str] = None
+    verification_status: VerificationStatus
+    response_rate: Optional[str] = Field(default=None, description="Decimal string 0.00-1.00; null until measured")
+    response_time_minutes: Optional[int] = None
+    host_since: date
+    access_level: Optional[AccessLevel] = None
+
+
+class HostUpdatedOut(BaseModel):
+    host_id: int
+    updated_datetime: datetime
