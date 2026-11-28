@@ -1,5 +1,4 @@
-"""Database models for the User & Host Service.
+"""SQLAlchemy entity models for user-service (tables in database/mysql/02_users.sql)."""
+from app.models.user import Admin, Guest, Host, HostThreadResponse
 
-MySQL tables: SQLAlchemy 2.0 declarative models (subclass shared.database.Base).
-MongoDB documents: describe their shape with Pydantic models in app/schemas.
-"""
+__all__ = ["Guest", "Host", "Admin", "HostThreadResponse"]
