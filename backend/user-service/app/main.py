@@ -4,11 +4,14 @@ Run locally from the repository root:
     ./scripts/start-service.sh user-service
 Swagger UI: http://localhost:8101/docs
 """
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
-from app.routes import health
+from app.routes import auth, guests, health, hosts
 from shared.errors import register_exception_handlers
 
 app = FastAPI(
@@ -30,6 +33,11 @@ app.add_middleware(
 register_exception_handlers(app)
 
 app.include_router(health.router)
-# Add feature routers here, e.g.:
-# from app.routes import users
-# app.include_router(users.router, prefix="/api/v1/users")
+app.include_router(auth.router, prefix="/api/v1")
+app.include_router(guests.router, prefix="/api/v1")
+app.include_router(hosts.router, prefix="/api/v1")
+app.include_router(hosts.photo_router, prefix="/api/v1")
+
+# Uploaded profile photos (GET /media/profiles/<guests|hosts>/<id>.<jpg|png>).
+Path(settings.media_root).mkdir(parents=True, exist_ok=True)
+app.mount("/media", StaticFiles(directory=settings.media_root), name="media")
