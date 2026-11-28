@@ -41,3 +41,4 @@ tmp/
 
 # --- Local Claude Code settings ---
 .claude/
+backend/user-service/media/

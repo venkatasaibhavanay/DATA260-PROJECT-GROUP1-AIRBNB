@@ -4,7 +4,7 @@ export const MODULES = [
   { key: 'properties', path: '/properties', name: 'Property & Search', owner: 'Sanjana Reddy Katham', service: 'property-service' },
   { key: 'bookings', path: '/bookings', name: 'Booking & Reservations', owner: 'Venkata Sai Bhavana Yarrapragada', service: 'booking-service' },
   { key: 'messaging', path: '/messaging-reviews', name: 'Messaging & Reviews', owner: 'Srija Taduri', service: 'messaging-review-service' },
-  { key: 'ai', path: '/ai', name: 'Agentic AI & Recommendations', owner: 'Angela Wei', service: 'ai-service' },
+  { key: 'ai', path: '/ai', name: 'Agentic AI & Recommendations', owner: 'Angela Wai', service: 'ai-service' },
   { key: 'analytics', path: '/analytics', name: 'Analytics & Observability', owner: 'Eric Zhao', service: 'analytics-service' },
 ]
 
