@@ -35,3 +35,6 @@ app.include_router(health.router)
 # app.include_router(messaging.router, prefix="/api/v1/messaging")
 
 app.include_router(messaging.router, prefix="/api/v1")
+app.include_router(messaging.message_router, prefix="/api/v1")
+app.include_router(messaging.ws_router, prefix="/api/v1")
+app.include_router(messaging.review_router, prefix="/api/v1")
